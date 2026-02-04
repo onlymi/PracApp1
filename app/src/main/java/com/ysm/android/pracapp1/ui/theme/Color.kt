@@ -1,4 +1,4 @@
-package com.ysm.android.pracapp.ui.theme
+package com.ysm.android.pracapp1.ui.theme
 
 import androidx.compose.ui.graphics.Color
 

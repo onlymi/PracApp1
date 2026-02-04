@@ -1,4 +1,4 @@
-package com.ysm.android.pracapp
+package com.ysm.android.pracapp1
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -32,11 +32,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.Lifecycle
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.ysm.android.pracapp.ui.theme.PracAppTheme
+import com.ysm.android.pracapp1.ui.theme.PracAppTheme
 
 class MainActivity : ComponentActivity() {
     private val counterViewModel: CounterViewModel by viewModels()

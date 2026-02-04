@@ -5,13 +5,13 @@ plugins {
 }
 
 android {
-    namespace = "com.ysm.android.pracapp"
+    namespace = "com.ysm.android.pracapp1"
     compileSdk {
         version = release(36)
     }
 
     defaultConfig {
-        applicationId = "com.ysm.android.pracapp"
+        applicationId = "com.ysm.android.pracapp1"
         minSdk = 26
         targetSdk = 36
         versionCode = 1
