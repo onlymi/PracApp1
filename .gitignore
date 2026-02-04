@@ -1,15 +1,44 @@
-*.iml
-.gradle
-/local.properties
-/.idea/caches
-/.idea/libraries
-/.idea/modules.xml
-/.idea/workspace.xml
-/.idea/navEditor.xml
-/.idea/assetWizardSettings.xml
-.DS_Store
-/build
-/captures
-.externalNativeBuild
-.cxx
+# [Build Artifacts] - 빌드 시 생성되는 임시 파일들
+# 빌드 결과물은 용량이 크고 소스 코드만 있으면 다시 만들 수 있어 제외합니다.
+bin/
+gen/
+out/
+build/
+/*/build/
+*.apk
+*.bundle
+
+# [Kotlin 관련]
+.kotlin/
+*.kotlin_module
+
+# [Local Configuration] - 내 컴퓨터에서만 필요한 설정
+# 다른 사람이 다운로드했을 때 경로가 달라 에러를 일으키는 주범입니다.
 local.properties
+.gradle/
+/captures/
+.externalNativeBuild/
+.cxx/
+
+# [IDE Settings (IntelliJ / Android Studio)]
+# 팀원들과 섞이면 창 크기, 열어둔 파일 등이 꼬이므로 제외합니다.
+.idea/workspace.xml
+.idea/navEditor.xml
+.idea/assetWizardSettings.xml
+.idea/modules.xml
+.idea/shelf/
+.idea/caches/
+.idea/libraries/
+*.iml
+*.iws
+
+# [Keystore / Secrets] - 보안 관련
+# 실제 앱 출시를 위한 서명 키나 API 비밀키는 절대 공개 저장소에 올리면 안 됩니다.
+*.jks
+*.keystore
+google-services.json
+secrets.xml
+
+# [OS Specific] - 운영체제 찌꺼기 파일
+.DS_Store
+Thumbs.db
