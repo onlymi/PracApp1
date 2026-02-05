@@ -5,14 +5,23 @@ import androidx.lifecycle.ViewModel
 
 class ListViewModel: ViewModel() {
 
-    private val _todoList = mutableStateListOf<String>()
-    val todoList: List<String> = _todoList
+    private val _todoList = mutableStateListOf<TodoItem>()
+    val todoList: List<TodoItem> = _todoList
 
     fun addTodo(item: String) {
-        if (item.isNotBlank()) _todoList.add(item)
+        val newId = (_todoList.lastOrNull()?.id ?: 0) + 1
+        _todoList.add(TodoItem(id = newId, task = item))
     }
 
-    fun removeTodo(item: String) {
+    fun toggleTodo(item: TodoItem) {
+        val index = _todoList.indexOf(item)
+        if (index != -1) {
+            // Compose가 변경을 감지하게 하려면 객체를 새로 만들어 교체해야 함
+            _todoList[index] = item.copy(isDone = !item.isDone)
+        }
+    }
+
+    fun removeTodo(item: TodoItem) {
         _todoList.remove(item)
     }
 }
