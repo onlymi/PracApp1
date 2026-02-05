@@ -46,8 +46,11 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -179,6 +182,11 @@ fun ListScreen(listViewModel: ListViewModel, onDelete: (TodoItem) -> Unit) {
                         )
                         Text(
                             text = item.task,
+                            style = TextStyle(
+                                // item.isDone이 true면 취소선을 긋고, 아니면 아무것도 안 함
+                                textDecoration = if (item.isDone) TextDecoration.LineThrough else TextDecoration.None,
+                                color = if (item.isDone) Color.Gray else Color.Black
+                            ),
                             modifier = Modifier
                                 .weight(1f)
                                 .padding(8.dp),
