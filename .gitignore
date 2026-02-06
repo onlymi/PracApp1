@@ -22,7 +22,7 @@ local.properties
 
 # [IDE Settings (IntelliJ / Android Studio)]
 # 팀원들과 섞이면 창 크기, 열어둔 파일 등이 꼬이므로 제외합니다.
-.idea/*
+.idea/
 .idea/workspace.xml
 .idea/navEditor.xml
 .idea/assetWizardSettings.xml
