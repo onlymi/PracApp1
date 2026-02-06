@@ -55,6 +55,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -139,8 +140,11 @@ fun CounterScreen(counterViewModel: CounterViewModel, onNavigateToList: () -> Un
 @Composable
 fun ListScreen(listViewModel: ListViewModel, onDelete: (TodoItem) -> Unit) {
     var textInput by remember { mutableStateOf("") }
+    val todoItems by listViewModel.todoList.collectAsStateWithLifecycle()
 
-    Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
+    Column(modifier = Modifier
+        .fillMaxSize()
+        .padding(16.dp)) {
         // 입력창
         Row(modifier = Modifier.fillMaxWidth()) {
             TextField(
@@ -162,48 +166,62 @@ fun ListScreen(listViewModel: ListViewModel, onDelete: (TodoItem) -> Unit) {
         }
 
         // 리스트 (LazyColumn은 대량의 데이터를 효율적으로 보여줌)
-        LazyColumn(modifier = Modifier.fillMaxSize().padding(top = 16.dp)) {
-            items(listViewModel.todoList) { item ->
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 0.dp, vertical = 4.dp),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
-                    ) {
-                    Row(modifier = Modifier
-                        .padding(horizontal = 16.dp, vertical = 8.dp)
-                        .fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Checkbox(
-                            checked = item.isDone,
-                            onCheckedChange = { listViewModel.toggleTodo(item) } // 클릭 시 toggleTodo 실행
-                        )
-                        Text(
-                            text = item.task,
-                            style = TextStyle(
-                                // item.isDone이 true면 취소선을 긋고, 아니면 아무것도 안 함
-                                textDecoration = if (item.isDone) TextDecoration.LineThrough else TextDecoration.None,
-                                color = if (item.isDone) Color.Gray else Color.Black
-                            ),
-                            modifier = Modifier
-                                .weight(1f)
-                                .padding(8.dp),
+        LazyColumn(modifier = Modifier
+            .fillMaxSize()
+            .padding(top = 16.dp)) {
+            items(todoItems, key = { it.id }) { item ->
+                TodoCard(
+                    item = item,
+                    onToggle = { listViewModel.toggleTodo(item) },
+                    onDelete = { onDelete(item) }
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun TodoCard(
+    item: TodoItem,
+    onToggle: () -> Unit,
+    onDelete: () -> Unit
+) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 0.dp, vertical = 4.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+    ) {
+        Row(
+            modifier = Modifier
+                .padding(horizontal = 16.dp, vertical = 8.dp)
+                .fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Checkbox(
+                checked = item.isDone,
+                onCheckedChange = { onToggle() } // 클릭 시 toggleTodo 실행
+            )
+            Text(
+                text = item.task,
+                style = TextStyle(
+                    // item.isDone이 true면 취소선을 긋고, 아니면 아무것도 안 함
+                    textDecoration = if (item.isDone) TextDecoration.LineThrough else TextDecoration.None,
+                    color = if (item.isDone) Color.Gray else Color.Black
+                ),
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(8.dp),
 //                            maxLines = 1,
 //                            overflow = TextOverflow.Ellipsis
-                        )
-                        IconButton(onClick = {
-                            onDelete(item)
-                        }) {
-                            Icon(
-                                imageVector = Icons.Default.Delete,
-                                contentDescription = "삭제",
-                                tint = androidx.compose.ui.graphics.Color.Red
-                            )
-                        }
-                    }
-                }
+            )
+            IconButton(onClick = onDelete) {
+                Icon(
+                    imageVector = Icons.Default.Delete,
+                    contentDescription = "삭제",
+                    tint = androidx.compose.ui.graphics.Color.Red
+                )
             }
         }
     }
