@@ -1,7 +1,12 @@
 package com.ysm.android.pracapp1
 
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+
+@Entity(tableName = "todo_table")
 data class TodoItem(
-    val id: Int,
+    @PrimaryKey(autoGenerate = true)
+    val id: Int = 0,
     val task: String,
     val isDone: Boolean = false
 )
