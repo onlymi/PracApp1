@@ -303,15 +303,15 @@ fun MainApp(counterViewModel: CounterViewModel, listViewModel: ListViewModel) {
     }
 }
 
-@SuppressLint("ViewModelConstructorInComposable")
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    PracAppTheme {
-//        MainApp(counterViewModel = CounterViewModel(), listViewModel = ListViewModel())
-        val lvm: ListViewModel = ListViewModel()
-        lvm.addTodo("hello")
-        lvm.addTodo("hahaha")
-        ListScreen(lvm) { }
-    }
-}
+//@SuppressLint("ViewModelConstructorInComposable")
+//@Preview(showBackground = true)
+//@Composable
+//fun GreetingPreview() {
+//    PracAppTheme {
+////        MainApp(counterViewModel = CounterViewModel(), listViewModel = ListViewModel())
+//        val lvm: ListViewModel = ListViewModel(TodoRepository())
+//        lvm.addTodo("hello")
+//        lvm.addTodo("hahaha")
+//        ListScreen(lvm) { }
+//    }
+//}
