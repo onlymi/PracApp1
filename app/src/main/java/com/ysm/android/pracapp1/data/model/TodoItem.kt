@@ -1,4 +1,4 @@
-package com.ysm.android.pracapp1
+package com.ysm.android.pracapp1.data.model
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey

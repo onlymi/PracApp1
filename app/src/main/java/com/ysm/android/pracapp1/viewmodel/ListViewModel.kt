@@ -1,7 +1,9 @@
-package com.ysm.android.pracapp1
+package com.ysm.android.pracapp1.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.ysm.android.pracapp1.data.model.TodoItem
+import com.ysm.android.pracapp1.data.repository.TodoRepository
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -17,12 +19,13 @@ class ListViewModel(private val repository: TodoRepository): ViewModel() {
     initialValue = emptyList()
 )
 
-    fun addTodo(item: String) {
+    fun addTodo(task: String) {
 //        val newId = (_todoList.value.lastOrNull()?.id ?: 0) + 1
 //        val newItem = TodoItem(id = newId, task = item)
 //        _todoList.value += newItem
+        if (task.isBlank()) return
         viewModelScope.launch {
-            repository.insert(TodoItem(task = item))
+            repository.insert(TodoItem(task = task))
         }
     }
 
@@ -36,7 +39,8 @@ class ListViewModel(private val repository: TodoRepository): ViewModel() {
 //            if (it.id == item.id) it.copy(isDone = !it.isDone) else it
 //        }
         viewModelScope.launch {
-            repository.update(item.copy(isDone = !item.isDone))
+            val updatedItem = item.copy(isDone = !item.isDone)
+            repository.update(updatedItem)
         }
     }
 

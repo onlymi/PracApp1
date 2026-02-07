@@ -1,5 +1,7 @@
-package com.ysm.android.pracapp1
+package com.ysm.android.pracapp1.data.repository
 
+import com.ysm.android.pracapp1.data.local.TodoDao
+import com.ysm.android.pracapp1.data.model.TodoItem
 import kotlinx.coroutines.flow.Flow
 
 class TodoRepository(private val todoDao: TodoDao) {

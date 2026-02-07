@@ -1,4 +1,4 @@
-package com.ysm.android.pracapp1
+package com.ysm.android.pracapp1.viewmodel
 
 import androidx.compose.runtime.*
 import androidx.lifecycle.ViewModel
