@@ -55,10 +55,12 @@ fun ListContent(
 ) {
     var textInput by remember { mutableStateOf("") }
 
-    Column(modifier = Modifier
-        .fillMaxSize()
-        .padding(16.dp)) {
-        Row(modifier = Modifier.fillMaxWidth()) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp)) {
+        Row(
+            modifier = Modifier.fillMaxWidth()) {
             TextField(
                 value = textInput,
                 onValueChange = { textInput = it },
@@ -69,7 +71,8 @@ fun ListContent(
                     keyboardType = KeyboardType.Text // 일반 텍스트 입력 모드
                 )
             )
-            Button(onClick = {
+            Button(
+                onClick = {
                 if (textInput.isNotBlank()) {
                     onAddTodo(textInput)
                     textInput = ""
