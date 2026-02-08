@@ -64,7 +64,9 @@ fun ListContent(
             TextField(
                 value = textInput,
                 onValueChange = { textInput = it },
-                modifier = Modifier.weight(1f),
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(end = 10.dp),
                 placeholder = { Text("할 일 입력") },
                 keyboardOptions = KeyboardOptions(
                     imeAction = ImeAction.Done, // 엔터 키 모양을 '완료'로 변경
