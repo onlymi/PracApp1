@@ -67,4 +67,7 @@ dependencies {
     implementation("androidx.room:room-runtime:$room_version")
     implementation("androidx.room:room-ktx:$room_version") // Flow 지원을 위해 필수
     ksp("androidx.room:room-compiler:$room_version")
+
+    // Icons
+    implementation("androidx.compose.material:material-icons-extended")
 }

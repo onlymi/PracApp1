@@ -25,7 +25,7 @@ class ListViewModel(private val repository: TodoRepository): ViewModel() {
 //        _todoList.value += newItem
         if (task.isBlank()) return
         viewModelScope.launch {
-            repository.insert(TodoItem(task = task))
+//            repository.insert(TodoItem(title = task))
         }
     }
 

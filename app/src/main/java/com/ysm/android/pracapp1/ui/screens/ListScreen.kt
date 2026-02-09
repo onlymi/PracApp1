@@ -107,10 +107,12 @@ fun ListContent(
 @Composable
 fun ListScreenPreview() {
     PracAppTheme {
+        val currentDateTime: Long = System.currentTimeMillis()
+
         val mockData = listOf(
-            TodoItem(id = 1, task = "복습하기", isDone = false),
-            TodoItem(id = 2, task = "Room DB 연결 완료", isDone = true),
-            TodoItem(id = 3, task = "운동 가기", isDone = false)
+            TodoItem(id = 1, title = "복습하기", content = "Kotlin 기본 문법 복습하기", date = currentDateTime, isDone = false, imagePath = "/"),
+            TodoItem(id = 2, title = "Room DB 연결", content = "Room DB 연결 완료", date = currentDateTime, isDone = true, imagePath = "/"),
+            TodoItem(id = 3, title = "운동 가기", content = "하체 운동 하기", date = currentDateTime, isDone = false, imagePath = "/")
         )
 
         ListContent(
