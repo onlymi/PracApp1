@@ -30,7 +30,7 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainApp(counterViewModel: CounterViewModel, listViewModel: ListViewModel) {
+fun MainScreen(counterViewModel: CounterViewModel, listViewModel: ListViewModel) {
     val navController = rememberNavController()
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()

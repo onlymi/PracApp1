@@ -7,20 +7,21 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import com.ysm.android.pracapp1.data.local.AppDatabase
 import com.ysm.android.pracapp1.data.repository.TodoRepository
-import com.ysm.android.pracapp1.ui.screens.MainApp
+import com.ysm.android.pracapp1.ui.screens.MainScreen
 import com.ysm.android.pracapp1.ui.theme.PracAppTheme
 import com.ysm.android.pracapp1.viewmodel.CounterViewModel
 import com.ysm.android.pracapp1.viewmodel.ListViewModel
 import com.ysm.android.pracapp1.viewmodel.TodoViewModelFactory
 
 class MainActivity : ComponentActivity() {
+
+    private val database by lazy { AppDatabase.getDatabase(this) }
+    private val repository by lazy { TodoRepository(database.todoDao()) }
     private val counterViewModel: CounterViewModel by viewModels()
 //    private val listViewModel: ListViewModel by viewModels()
     private val listViewModel: ListViewModel by viewModels {
         TodoViewModelFactory(repository)
     }
-    private val database by lazy { AppDatabase.getDatabase(this) }
-    private val repository by lazy { TodoRepository(database.todoDao()) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -37,7 +38,7 @@ class MainActivity : ComponentActivity() {
 //                        modifier = Modifier.padding(innerPadding)
 //                    )
 //                }
-                MainApp(counterViewModel, listViewModel)
+                MainScreen(counterViewModel, listViewModel)
             }
         }
     }

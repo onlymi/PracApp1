@@ -1,29 +1,34 @@
 package com.ysm.android.pracapp1.ui.screens
 
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.Button
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.ysm.android.pracapp1.data.model.TodoDraft
 import com.ysm.android.pracapp1.data.model.TodoItem
 import com.ysm.android.pracapp1.ui.components.TodoCard
+import com.ysm.android.pracapp1.ui.components.TodoInputForm
 import com.ysm.android.pracapp1.ui.theme.PracAppTheme
 import com.ysm.android.pracapp1.viewmodel.ListViewModel
 
@@ -36,11 +41,11 @@ fun ListScreen(
 
     ListContent(
         todoItems = todoItems,
-        onAddTodo = {
-            listViewModel.addTodo(it)
+        onAddTodo = { draft ->
+            listViewModel.addTodo(draft)
         },
-        onToggleTodo = {
-            listViewModel.toggleTodo(it)
+        onToggleTodo = { item ->
+            listViewModel.toggleTodo(item)
         },
         onDeleteTodo = onDelete
     )
@@ -49,55 +54,59 @@ fun ListScreen(
 @Composable
 fun ListContent(
     todoItems: List<TodoItem>,
-    onAddTodo: (String) -> Unit,
+    onAddTodo: (TodoDraft) -> Unit,
     onToggleTodo: (TodoItem) -> Unit,
     onDeleteTodo: (TodoItem) -> Unit
 ) {
-    var textInput by remember { mutableStateOf("") }
+    var showInputForm by remember { mutableStateOf(false) }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp)) {
-        Row(
-            modifier = Modifier.fillMaxWidth()) {
-            TextField(
-                value = textInput,
-                onValueChange = { textInput = it },
-                modifier = Modifier
-                    .weight(1f)
-                    .padding(end = 10.dp),
-                placeholder = { Text("할 일 입력") },
-                keyboardOptions = KeyboardOptions(
-                    imeAction = ImeAction.Done, // 엔터 키 모양을 '완료'로 변경
-                    keyboardType = KeyboardType.Text // 일반 텍스트 입력 모드
-                )
-            )
-            Button(
-                onClick = {
-                if (textInput.isNotBlank()) {
-                    onAddTodo(textInput)
-                    textInput = ""
-                }
-            }) { Text("추가") }
+    Scaffold(
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = { showInputForm = true }, // 버튼 클릭 시 폼 열기
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.onPrimary,
+                shape = CircleShape
+            ) {
+                Icon(Icons.Default.Add, contentDescription = "추가")
+            }
         }
-
-        // 리스트 (LazyColumn은 대량의 데이터를 효율적으로 보여줌)
-        LazyColumn(
+    ) { paddingValues ->
+        Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(top = 16.dp)
+                .padding(paddingValues)
         ) {
-            items(todoItems, key = { it.id }) { item ->
-                TodoCard(
-                    item = item,
-                    onToggle = {
-                        onToggleTodo(item)
-                    },
-                    onDelete = {
-                        onDeleteTodo(item)
-                    }
-                )
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp)
+            ) {
+                items(todoItems, key = { it.id }) { item ->
+                    TodoCard(
+                        item = item,
+                        onToggle = { onToggleTodo(item) },
+                        onDelete = { onDeleteTodo(item) }
+                    )
+                }
+            }
+
+            if (showInputForm) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(Color.Black.copy(alpha = 0.4f)),
+//                        .clickable { showInputForm = false }, // 배경 클릭 시 닫기
+                    contentAlignment = Alignment.Center
+                ) {
+                    TodoInputForm(
+                        onSave = { draft ->
+                            onAddTodo(draft)
+                            showInputForm = false // 저장 후 닫기
+                        },
+                        onDismiss = { showInputForm = false } // 취소 시 닫기
+                    )
+                }
             }
         }
     }
