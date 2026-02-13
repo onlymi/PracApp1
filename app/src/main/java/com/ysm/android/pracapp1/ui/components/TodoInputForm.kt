@@ -45,13 +45,22 @@ fun TodoInputForm(
     onSave: (TodoDto) -> Unit,
     onDismiss: () -> Unit
 ) {
-    var title: String by remember { mutableStateOf(initialTodoDto?.title ?: "") }
-    var content: String by remember { mutableStateOf(initialTodoDto?.content ?: "") }
+    val originalTitle: String = initialTodoDto?.title ?: ""
+    val originalContent: String = initialTodoDto?.content ?: ""
+    val originalImagePath: String? = initialTodoDto?.imagePath
+
+    var title: String by remember { mutableStateOf(originalTitle) }
+    var content: String by remember { mutableStateOf(originalContent) }
     var taskIsDone: Boolean by remember { mutableStateOf(initialTodoDto?.isDone ?: false) }
-    var selectedImagePath: String? by remember { mutableStateOf(initialTodoDto?.imagePath) }
+    var selectedImagePath: String? by remember { mutableStateOf(originalImagePath) }
+
+
+    val isNotBlank: Boolean = title.isNotBlank() && content.isNotBlank()
+    val isModified: Boolean =
+        title.trim() != originalTitle || content.trim() != originalContent
+                || selectedImagePath?.trim() != originalImagePath
 
     val isEditMode = initialTodoDto != null
-    println(isEditMode)
 
     val createDate: Long = remember { initialTodoDto?.createdDate ?: System.currentTimeMillis() }
     val modifiedDate: Long? = remember(isEditMode) { if (isEditMode) System.currentTimeMillis() else null }
@@ -189,7 +198,7 @@ fun TodoInputForm(
                         onSave(draft)
                     },
                     modifier = Modifier.weight(1f),
-                    enabled = title.isNotBlank() && content.isNotBlank()
+                    enabled = isNotBlank && (if (isEditMode) isModified else true)
                 ) {
                     Text(if (isEditMode) "수정하기" else "저장하기")
                 }
