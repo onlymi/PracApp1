@@ -34,90 +34,87 @@ import com.ysm.android.pracapp1.ui.theme.PracAppTheme
 import com.ysm.android.pracapp1.utils.toFormattedDateString
 
 @Composable
-fun TodoDetailView (
+fun TodoDetailView(
     todoDetail: TodoDto,
     onDismiss: () -> Unit,
     onEditClick: () -> Unit,
     onDeleteClick: () -> Unit
 ) {
-    Box(
+    Card(
         modifier = Modifier
-            .fillMaxSize()
-            .background(Color.Black.copy(alpha = 0.5f))
-            .clickable { onDismiss() },
-        contentAlignment = Alignment.Center
+            .fillMaxWidth(0.85f)
+            .clickable(enabled = false) { },
+        shape = RoundedCornerShape(24.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
     ) {
-        Card(
+        Column(
             modifier = Modifier
-                .fillMaxWidth(0.85f)
-                .clickable(enabled = false) { },
-            shape = RoundedCornerShape(24.dp),
-            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+                .padding(20.dp)
+                .verticalScroll(rememberScrollState())
         ) {
-            Column(
-                modifier = Modifier
-                    .padding(20.dp)
-                    .verticalScroll(rememberScrollState())
-            ) {
-                if (!todoDetail.imagePath.isNullOrBlank()) {
-                    // TODO: Coil 라이브러리 추가 후 AsyncImage로 교체 예정
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(200.dp)
-                            .background(
-                                color = MaterialTheme.colorScheme.surfaceVariant,
-                                shape = RoundedCornerShape(16.dp)
-                            ),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            text = "이미지 경로: ${ todoDetail.imagePath }",
-                            style = MaterialTheme.typography.bodySmall
-                        )
-                    }
-                    Spacer(modifier = Modifier.height(16.dp))
-                }
-
-                Text(
-                    text = todoDetail.title,
-                    style = MaterialTheme.typography.headlineSmall,
-                    fontWeight = FontWeight.Bold
-                )
-
-                Spacer(modifier = Modifier.height(8.dp))
-
-                Text(
-                    text =
-                        if (todoDetail.modifiedDate != null) todoDetail.modifiedDate.toFormattedDateString()
-                        else todoDetail.createdDate.toFormattedDateString(),
-                    style = MaterialTheme.typography.labelMedium,
-                    color = MaterialTheme.colorScheme.outline
-                )
-
-                HorizontalDivider(modifier = Modifier.padding(vertical = 12.dp))
-
-                Text(
-                    text = todoDetail.content,
-                    style = MaterialTheme.typography.bodyLarge,
-                    lineHeight = 24.sp
-                )
-
-                Spacer(modifier = Modifier.height(24.dp))
-
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.End
+            if (!todoDetail.imagePath.isNullOrBlank()) {
+                // TODO: Coil 라이브러리 추가 후 AsyncImage로 교체 예정
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(200.dp)
+                        .background(
+                            color = MaterialTheme.colorScheme.surfaceVariant,
+                            shape = RoundedCornerShape(16.dp)
+                        ),
+                    contentAlignment = Alignment.Center
                 ) {
-                    TextButton(onClick = onDeleteClick) {
-                        Text("삭제", color = MaterialTheme.colorScheme.error)
-                    }
-                    TextButton(onClick = onEditClick) {
-                        Text("수정")
-                    }
-                    Button(onClick = onDismiss, modifier = Modifier.padding(start = 8.dp)) {
-                        Text("확인")
-                    }
+                    Text(
+                        text = "이미지 경로: ${todoDetail.imagePath}",
+                        style = MaterialTheme.typography.bodySmall
+                    )
+                }
+                Spacer(modifier = Modifier.height(16.dp))
+            }
+
+            Text(
+                modifier = Modifier.padding(start = 2.dp),
+                text = todoDetail.title,
+                style = MaterialTheme.typography.headlineSmall,
+                fontWeight = FontWeight.Bold
+            )
+
+            Spacer(modifier = Modifier.height(2.dp))
+
+            val dateText =
+                if (todoDetail.modifiedDate != null) todoDetail.modifiedDate.toFormattedDateString()
+                else todoDetail.createdDate.toFormattedDateString()
+
+            Text(
+                modifier = Modifier.padding(start = 2.dp),
+                text = "마지막 수정일 : $dateText",
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.outline
+            )
+
+            HorizontalDivider(modifier = Modifier.padding(top = 4.dp, bottom = 12.dp))
+
+            Text(
+                modifier = Modifier.padding(start = 2.dp),
+                text = todoDetail.content,
+                style = MaterialTheme.typography.bodyLarge,
+                lineHeight = 24.sp
+            )
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.End
+            ) {
+                TextButton(onClick = onDeleteClick) {
+                    Text("삭제", color = MaterialTheme.colorScheme.error)
+                }
+                TextButton(onClick = onEditClick) {
+                    Text("수정")
+                }
+                Button(onClick = onDismiss, modifier = Modifier.padding(start = 8.dp)) {
+                    Text("확인")
                 }
             }
         }
@@ -129,13 +126,26 @@ fun TodoDetailView (
 fun TodoDetailPreview() {
     PracAppTheme {
         val currentDateTime: Long = System.currentTimeMillis()
-        val mockData = TodoDto(title = "복습하기", content = "Kotlin 기본 문법 복습하기", createdDate = currentDateTime, isDone = false, imagePath = "/")
-
-        TodoDetailView(
-            todoDetail = mockData,
-            onDismiss = {},
-            onEditClick = {},
-            onDeleteClick = {}
+        val mockData = TodoDto(
+            title = "복습하기",
+            content = "Kotlin 기본 문법 복습하기",
+            createdDate = currentDateTime,
+            isDone = false,
+            imagePath = "/"
         )
+
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.Black.copy(alpha = 0.4f)),
+            contentAlignment = Alignment.Center
+        ) {
+            TodoDetailView(
+                todoDetail = mockData,
+                onDismiss = {},
+                onEditClick = {},
+                onDeleteClick = {}
+            )
+        }
     }
 }

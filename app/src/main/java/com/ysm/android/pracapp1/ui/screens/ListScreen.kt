@@ -1,6 +1,5 @@
 package com.ysm.android.pracapp1.ui.screens
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -19,11 +18,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ysm.android.pracapp1.data.model.TodoDto
 import com.ysm.android.pracapp1.data.model.TodoItem
@@ -33,6 +32,12 @@ import com.ysm.android.pracapp1.ui.components.TodoDetailView
 import com.ysm.android.pracapp1.ui.components.TodoInputForm
 import com.ysm.android.pracapp1.ui.theme.PracAppTheme
 import com.ysm.android.pracapp1.viewmodel.ListViewModel
+
+sealed class TodoScreenState {
+    object Idle : TodoScreenState()
+    data class Detail(val item: TodoItem) : TodoScreenState()
+    data class Edit(val item: TodoItem?) : TodoScreenState()
+}
 
 @Composable
 fun ListScreen(
@@ -67,13 +72,14 @@ fun ListContent(
     onEditTodo: (TodoItem, TodoDto) -> Unit,
     onDeleteTodo: (TodoItem) -> Unit
 ) {
-    var showInputForm by remember { mutableStateOf(false) }
-    var selectedTodoItem by remember { mutableStateOf<TodoItem?>(null) }
+    var screenState by remember { mutableStateOf<TodoScreenState>(TodoScreenState.Idle) }
 
     Scaffold(
         floatingActionButton = {
             FloatingActionButton(
-                onClick = { showInputForm = true },
+                onClick = {
+                    screenState = TodoScreenState.Edit(null)
+                },
                 containerColor = MaterialTheme.colorScheme.primary,
                 contentColor = MaterialTheme.colorScheme.onPrimary,
                 shape = CircleShape
@@ -84,7 +90,8 @@ fun ListContent(
                 )
             }
         }
-    ) { paddingValues ->
+    ) {
+        paddingValues ->
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -99,7 +106,7 @@ fun ListContent(
                     TodoCard(
                         item = item,
                         modifier = Modifier.clickable {
-                            selectedTodoItem = item
+                            screenState = TodoScreenState.Detail(item)
                         },
                         onToggle = { onToggleTodo(item) },
                         onDelete = { onDeleteTodo(item) }
@@ -107,44 +114,45 @@ fun ListContent(
                 }
             }
 
-            if (selectedTodoItem != null) {
-                TodoDetailView(
-                    todoDetail = selectedTodoItem!!.toDto(),
-                    onDismiss = { selectedTodoItem = null },
-                    onEditClick = {
-                        showInputForm = true
-                    },
-                    onDeleteClick = {
-                        onDeleteTodo(selectedTodoItem!!)
-                        selectedTodoItem = null
-                    }
-                )
-            }
+            when (val state = screenState) {
+                is TodoScreenState.Detail -> {
+                    Dialog(
+                        onDismissRequest = { screenState = TodoScreenState.Idle },
+                        properties = DialogProperties(
+                            usePlatformDefaultWidth = false
+                        )
 
-            if (showInputForm) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(Color.Black.copy(alpha = 0.4f)),
-//                        .clickable { showInputForm = false }, // 배경 클릭 시 닫기
-                    contentAlignment = Alignment.Center
-                ) {
-                    TodoInputForm(
-                        initialTodoDto = selectedTodoItem?.toDto(),
-                        onSave = { draft ->
-                            if (selectedTodoItem == null) {
-                                onAddTodo(draft)
-                            } else {
-                                onEditTodo(selectedTodoItem!!, draft)
+                    ) {
+                        TodoDetailView(
+                            todoDetail = state.item.toDto(),
+                            onDismiss = { screenState = TodoScreenState.Idle },
+                            onEditClick = { screenState = TodoScreenState.Edit(state.item) },
+                            onDeleteClick = {
+                                onDeleteTodo(state.item)
+                                screenState = TodoScreenState.Idle
                             }
-                            showInputForm = false
-                            selectedTodoItem = null
-                        },
-                        onDismiss = {
-                            showInputForm = false
-                        }
-                    )
+                        )
+                    }
                 }
+                is TodoScreenState.Edit -> {
+                    Dialog(
+                        onDismissRequest = { screenState = TodoScreenState.Idle },
+                        properties = DialogProperties(
+                            usePlatformDefaultWidth = false
+                        )
+                    ) {
+                        TodoInputForm(
+                            initialTodoDto = state.item?.toDto(),
+                            onSave = { draft ->
+                                if (state.item == null) onAddTodo(draft)
+                                else onEditTodo(state.item, draft)
+                                screenState = TodoScreenState.Idle
+                            },
+                            onDismiss = { screenState = TodoScreenState.Idle }
+                        )
+                    }
+                }
+                TodoScreenState.Idle -> {  }
             }
         }
     }
@@ -157,9 +165,30 @@ fun ListScreenPreview() {
         val currentDateTime: Long = System.currentTimeMillis()
 
         val mockData = listOf(
-            TodoItem(id = 1, title = "복습하기", content = "Kotlin 기본 문법 복습하기", createdDate = currentDateTime, isDone = false, imagePath = "/"),
-            TodoItem(id = 2, title = "Room DB 연결", content = "Room DB 연결 완료", createdDate = currentDateTime, isDone = true, imagePath = "/"),
-            TodoItem(id = 3, title = "운동 가기", content = "하체 운동 하기", createdDate = currentDateTime, isDone = false, imagePath = "/")
+            TodoItem(
+                id = 1,
+                title = "복습하기",
+                content = "Kotlin 기본 문법 복습하기",
+                createdDate = currentDateTime,
+                isDone = false,
+                imagePath = "/"
+            ),
+            TodoItem(
+                id = 2,
+                title = "Room DB 연결",
+                content = "Room DB 연결 완료",
+                createdDate = currentDateTime,
+                isDone = true,
+                imagePath = "/"
+            ),
+            TodoItem(
+                id = 3,
+                title = "운동 가기",
+                content = "하체 운동 하기",
+                createdDate = currentDateTime,
+                isDone = false,
+                imagePath = "/"
+            )
         )
 
         ListContent(
