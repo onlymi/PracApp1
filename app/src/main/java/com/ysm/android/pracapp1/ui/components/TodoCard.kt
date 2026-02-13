@@ -1,7 +1,6 @@
 package com.ysm.android.pracapp1.ui.components
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -30,11 +29,12 @@ import com.ysm.android.pracapp1.ui.theme.PracAppTheme
 @Composable
 fun TodoCard(
     item: TodoItem,
+    modifier: Modifier = Modifier,
     onToggle: () -> Unit,
     onDelete: () -> Unit
 ) {
     Card(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = 0.dp, vertical = 4.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
@@ -81,8 +81,8 @@ fun TodoCardPreview() {
         val currentDateTime: Long = System.currentTimeMillis()
 
         val mockData = listOf(
-            TodoItem(id = 1, title = "복습하기", content = "Kotlin 기본 문법 복습하기", date = currentDateTime, isDone = false, imagePath = "/"),
-            TodoItem(id = 2, title = "Room DB 연결", content = "Room DB 연결 완료", date = currentDateTime, isDone = true, imagePath = "/"),
+            TodoItem(id = 1, title = "복습하기", content = "Kotlin 기본 문법 복습하기", createdDate = currentDateTime, isDone = false, imagePath = "/"),
+            TodoItem(id = 2, title = "Room DB 연결", content = "Room DB 연결 완료", createdDate = currentDateTime, isDone = true, imagePath = "/"),
         )
 
         LazyColumn(
@@ -94,6 +94,7 @@ fun TodoCardPreview() {
             items(mockData, key = { it.id }) { item ->
                 TodoCard(
                     item = item,
+                    modifier = Modifier,
                     onToggle = { },
                     onDelete = { }
                 )

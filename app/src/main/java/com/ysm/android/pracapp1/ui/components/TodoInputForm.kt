@@ -1,6 +1,5 @@
 package com.ysm.android.pracapp1.ui.components
 
-import android.text.format.DateUtils
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -21,12 +20,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
-import androidx.compose.material3.SegmentedButtonDefaults.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -36,22 +33,26 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.ysm.android.pracapp1.data.model.TodoDraft
-import com.ysm.android.pracapp1.data.model.TodoItem
+import com.ysm.android.pracapp1.data.model.TodoDto
 import com.ysm.android.pracapp1.ui.theme.PracAppTheme
 import com.ysm.android.pracapp1.utils.toFormattedDateString
 
 @Composable
 fun TodoInputForm(
-    initialDate: Long = System.currentTimeMillis(),
-    onSave: (TodoDraft) -> Unit,
+    initialTodoDto: TodoDto? = null,
+    onSave: (TodoDto) -> Unit,
     onDismiss: () -> Unit
 ) {
-    var title: String by remember { mutableStateOf("") }
-    var content: String by remember { mutableStateOf("") }
-    var currentDate: Long by remember { mutableLongStateOf(initialDate) }
-    var taskIsDone: Boolean by remember { mutableStateOf(false) }
-    var selectedImagePath: String? by remember { mutableStateOf<String?>(null) }
+    var title: String by remember { mutableStateOf(initialTodoDto?.title ?: "") }
+    var content: String by remember { mutableStateOf(initialTodoDto?.content ?: "") }
+    var taskIsDone: Boolean by remember { mutableStateOf(initialTodoDto?.isDone ?: false) }
+    var selectedImagePath: String? by remember { mutableStateOf(initialTodoDto?.imagePath) }
+
+    val isEditMode = initialTodoDto != null
+    println(isEditMode)
+
+    val createDate: Long = remember { initialTodoDto?.createdDate ?: System.currentTimeMillis() }
+    val modifiedDate: Long? = remember(isEditMode) { if (isEditMode) System.currentTimeMillis() else null }
 
     Card(
         modifier = Modifier
@@ -80,7 +81,7 @@ fun TodoInputForm(
                 modifier = Modifier
                     .fillMaxWidth()
                     .background(MaterialTheme.colorScheme.surfaceVariant, RoundedCornerShape(8.dp))
-                    .padding(12.dp)
+                    .padding(start = 12.dp, end = 12.dp, top = 12.dp, bottom = 0.dp)
             ) {
                 Icon(
                     imageVector = Icons.Default.DateRange,
@@ -99,10 +100,43 @@ fun TodoInputForm(
                     )
 
                     Text(
-                        text = currentDate.toFormattedDateString(),
+                        text = createDate.toFormattedDateString(),
                         style = MaterialTheme.typography.bodyMedium,
                         fontWeight = FontWeight.Medium
                     )
+                }
+            }
+
+            if (isEditMode) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(MaterialTheme.colorScheme.surfaceVariant, RoundedCornerShape(8.dp))
+                        .padding(start = 12.dp, end = 12.dp, top = 0.dp, bottom = 12.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.DateRange,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+
+                    Spacer(
+                        modifier = Modifier.width(8.dp)
+                    )
+
+                    Column {
+                        Text(
+                            text = "수정 시점",
+                            style = MaterialTheme.typography.labelSmall
+                        )
+
+                        Text(
+                            text = modifiedDate!!.toFormattedDateString(),
+                            style = MaterialTheme.typography.bodyMedium,
+                            fontWeight = FontWeight.Medium
+                        )
+                    }
                 }
             }
 
@@ -112,7 +146,7 @@ fun TodoInputForm(
                 label = { Text("이 장소의 한 문장은 무엇인가요?") },
                 modifier = Modifier.fillMaxWidth(),
                 colors = OutlinedTextFieldDefaults.colors(
-                    unfocusedContainerColor = Color.Transparent, // 카드 배경색이 그대로 보임
+                    unfocusedContainerColor = Color.Transparent,
                     focusedContainerColor = Color.White.copy(alpha = 0.1f)
                 )
             )
@@ -143,10 +177,10 @@ fun TodoInputForm(
                 }
                 Button(
                     onClick = {
-                        val draft = TodoDraft(
+                        val draft = TodoDto(
                             title = title,
                             content = content,
-                            date = currentDate,
+                            createdDate = createDate,
                             isDone = taskIsDone,
                             imagePath = selectedImagePath
                         )
@@ -155,7 +189,7 @@ fun TodoInputForm(
                     modifier = Modifier.weight(1f),
                     enabled = title.isNotBlank() && content.isNotBlank()
                 ) {
-                    Text("저장하기")
+                    Text(if (isEditMode) "수정하기" else "저장하기")
                 }
             }
         }
@@ -166,8 +200,6 @@ fun TodoInputForm(
 @Composable
 fun TodoInputFormPreview() {
     PracAppTheme {
-        val currentDateTime: Long = System.currentTimeMillis()
-
         TodoInputForm(
             onSave = { draft -> println("Saved: $draft") },
             onDismiss = { }

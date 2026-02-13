@@ -25,9 +25,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.ysm.android.pracapp1.data.model.TodoDraft
+import com.ysm.android.pracapp1.data.model.TodoDto
 import com.ysm.android.pracapp1.data.model.TodoItem
+import com.ysm.android.pracapp1.data.model.toDto
 import com.ysm.android.pracapp1.ui.components.TodoCard
+import com.ysm.android.pracapp1.ui.components.TodoDetailView
 import com.ysm.android.pracapp1.ui.components.TodoInputForm
 import com.ysm.android.pracapp1.ui.theme.PracAppTheme
 import com.ysm.android.pracapp1.viewmodel.ListViewModel
@@ -41,11 +43,17 @@ fun ListScreen(
 
     ListContent(
         todoItems = todoItems,
-        onAddTodo = { draft ->
-            listViewModel.addTodo(draft)
+        onAddTodo = { todoDraft ->
+            listViewModel.addTodo(todoDraft = todoDraft)
         },
         onToggleTodo = { item ->
             listViewModel.toggleTodo(item)
+        },
+        onEditTodo = { originItem, modifiedItem ->
+            listViewModel.editTodo(
+                originItem = originItem,
+                updatedDto = modifiedItem
+            )
         },
         onDeleteTodo = onDelete
     )
@@ -54,21 +62,26 @@ fun ListScreen(
 @Composable
 fun ListContent(
     todoItems: List<TodoItem>,
-    onAddTodo: (TodoDraft) -> Unit,
+    onAddTodo: (TodoDto) -> Unit,
     onToggleTodo: (TodoItem) -> Unit,
+    onEditTodo: (TodoItem, TodoDto) -> Unit,
     onDeleteTodo: (TodoItem) -> Unit
 ) {
     var showInputForm by remember { mutableStateOf(false) }
+    var selectedTodoItem by remember { mutableStateOf<TodoItem?>(null) }
 
     Scaffold(
         floatingActionButton = {
             FloatingActionButton(
-                onClick = { showInputForm = true }, // 버튼 클릭 시 폼 열기
+                onClick = { showInputForm = true },
                 containerColor = MaterialTheme.colorScheme.primary,
                 contentColor = MaterialTheme.colorScheme.onPrimary,
                 shape = CircleShape
             ) {
-                Icon(Icons.Default.Add, contentDescription = "추가")
+                Icon(
+                    imageVector = Icons.Default.Add,
+                    contentDescription = "추가"
+                )
             }
         }
     ) { paddingValues ->
@@ -85,10 +98,27 @@ fun ListContent(
                 items(todoItems, key = { it.id }) { item ->
                     TodoCard(
                         item = item,
+                        modifier = Modifier.clickable {
+                            selectedTodoItem = item
+                        },
                         onToggle = { onToggleTodo(item) },
                         onDelete = { onDeleteTodo(item) }
                     )
                 }
+            }
+
+            if (selectedTodoItem != null) {
+                TodoDetailView(
+                    todoDetail = selectedTodoItem!!.toDto(),
+                    onDismiss = { selectedTodoItem = null },
+                    onEditClick = {
+                        showInputForm = true
+                    },
+                    onDeleteClick = {
+                        onDeleteTodo(selectedTodoItem!!)
+                        selectedTodoItem = null
+                    }
+                )
             }
 
             if (showInputForm) {
@@ -100,11 +130,19 @@ fun ListContent(
                     contentAlignment = Alignment.Center
                 ) {
                     TodoInputForm(
+                        initialTodoDto = selectedTodoItem?.toDto(),
                         onSave = { draft ->
-                            onAddTodo(draft)
-                            showInputForm = false // 저장 후 닫기
+                            if (selectedTodoItem == null) {
+                                onAddTodo(draft)
+                            } else {
+                                onEditTodo(selectedTodoItem!!, draft)
+                            }
+                            showInputForm = false
+                            selectedTodoItem = null
                         },
-                        onDismiss = { showInputForm = false } // 취소 시 닫기
+                        onDismiss = {
+                            showInputForm = false
+                        }
                     )
                 }
             }
@@ -119,15 +157,16 @@ fun ListScreenPreview() {
         val currentDateTime: Long = System.currentTimeMillis()
 
         val mockData = listOf(
-            TodoItem(id = 1, title = "복습하기", content = "Kotlin 기본 문법 복습하기", date = currentDateTime, isDone = false, imagePath = "/"),
-            TodoItem(id = 2, title = "Room DB 연결", content = "Room DB 연결 완료", date = currentDateTime, isDone = true, imagePath = "/"),
-            TodoItem(id = 3, title = "운동 가기", content = "하체 운동 하기", date = currentDateTime, isDone = false, imagePath = "/")
+            TodoItem(id = 1, title = "복습하기", content = "Kotlin 기본 문법 복습하기", createdDate = currentDateTime, isDone = false, imagePath = "/"),
+            TodoItem(id = 2, title = "Room DB 연결", content = "Room DB 연결 완료", createdDate = currentDateTime, isDone = true, imagePath = "/"),
+            TodoItem(id = 3, title = "운동 가기", content = "하체 운동 하기", createdDate = currentDateTime, isDone = false, imagePath = "/")
         )
 
         ListContent(
             todoItems = mockData,
             onAddTodo = {},
             onToggleTodo = {},
+            onEditTodo = { item, dto -> },
             onDeleteTodo = {}
         )
     }
