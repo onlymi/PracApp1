@@ -7,7 +7,7 @@ import androidx.room.RoomDatabase
 import com.ysm.android.pracapp1.data.model.TodoItem
 
 @Database(entities = [TodoItem::class], version = 1)
-abstract class AppDatabase: RoomDatabase() {
+abstract class AppDatabase : RoomDatabase() {
     abstract fun todoDao(): TodoDao
 
     companion object {
@@ -20,7 +20,9 @@ abstract class AppDatabase: RoomDatabase() {
                     context.applicationContext,
                     AppDatabase::class.java,
                     "todo_database"
-                ).build()
+                )
+                    .fallbackToDestructiveMigration()
+                    .build()
                 INSTANCE = instance
                 instance
             }

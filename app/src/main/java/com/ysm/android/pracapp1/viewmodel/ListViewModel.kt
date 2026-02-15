@@ -2,6 +2,7 @@ package com.ysm.android.pracapp1.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.ysm.android.pracapp1.data.model.TodoDto
 import com.ysm.android.pracapp1.data.model.TodoItem
 import com.ysm.android.pracapp1.data.repository.TodoRepository
 import kotlinx.coroutines.flow.SharingStarted
@@ -14,18 +15,24 @@ class ListViewModel(private val repository: TodoRepository): ViewModel() {
 //    val todoList: StateFlow<List<TodoItem>> = _todoList.asStateFlow()
 
     val todoList = repository.allTodos.stateIn(
-    scope = viewModelScope,
-    started = SharingStarted.WhileSubscribed(5000),
-    initialValue = emptyList()
-)
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = emptyList()
+    )
 
-    fun addTodo(task: String) {
+    fun addTodo(todoDraft: TodoDto) {
 //        val newId = (_todoList.value.lastOrNull()?.id ?: 0) + 1
-//        val newItem = TodoItem(id = newId, task = item)
+        val newItem = TodoItem(
+            title = todoDraft.title,
+            content = todoDraft.content,
+            createdDate = todoDraft.createdDate,
+            isDone = todoDraft.isDone,
+            imagePath = todoDraft.imagePath
+        )
 //        _todoList.value += newItem
-        if (task.isBlank()) return
+        if (newItem.title.isBlank() || newItem.content.isBlank()) return
         viewModelScope.launch {
-            repository.insert(TodoItem(task = task))
+            repository.insert(newItem)
         }
     }
 
@@ -40,6 +47,18 @@ class ListViewModel(private val repository: TodoRepository): ViewModel() {
 //        }
         viewModelScope.launch {
             val updatedItem = item.copy(isDone = !item.isDone)
+            repository.update(updatedItem)
+        }
+    }
+
+    fun editTodo(originItem: TodoItem, updatedDto: TodoDto) {
+        viewModelScope.launch {
+            val updatedItem = originItem.copy(
+                title = updatedDto.title,
+                content = updatedDto.content,
+                imagePath = updatedDto.imagePath,
+                modifiedDate = System.currentTimeMillis()
+            )
             repository.update(updatedItem)
         }
     }

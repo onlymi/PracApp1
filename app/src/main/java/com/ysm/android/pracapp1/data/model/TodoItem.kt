@@ -7,6 +7,20 @@ import androidx.room.PrimaryKey
 data class TodoItem(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
-    val task: String,
-    val isDone: Boolean = false
+
+    val title: String,
+    val content: String,
+    val createdDate: Long,
+    val modifiedDate: Long? = null,
+    val isDone: Boolean = false,
+    val imagePath: String? = null
+)
+
+fun TodoItem.toDto(): TodoDto = TodoDto(
+    title = title,
+    content = content,
+    createdDate = createdDate,
+    modifiedDate = modifiedDate,
+    isDone = isDone,
+    imagePath = imagePath
 )
