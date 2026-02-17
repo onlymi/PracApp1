@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -67,7 +68,8 @@ fun TodoDetailView(
                     contentDescription = "선택된 이미지",
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(300.dp)
+//                        .height(300.dp)
+                        .aspectRatio(1f)
                         .clip(RoundedCornerShape(16.dp)),
                     contentScale = ContentScale.Crop,
                     loading = {
